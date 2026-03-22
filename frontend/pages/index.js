@@ -1,3 +1,13 @@
+import { useEffect } from "react";
+import api from "../lib/api";
+
 export default function Home() {
-  return <h1>🚀 Build Fixed</h1>;
+  useEffect(() => {
+    api.get("/")
+      .then(res => console.log(res.data))
+      .catch(err => console.log(err));
+  }, []);
+
+  return <h1>🚀 Taskpholio Connected</h1>;
 }
+
