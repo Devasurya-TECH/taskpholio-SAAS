@@ -62,7 +62,7 @@ if (process.env.SENTRY_DSN) {
 // Middleware
 app.use(helmet({ crossOriginResourcePolicy: false }));
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' ? process.env.FRONTEND_URL : ['http://localhost:3000', process.env.FRONTEND_URL],
+  origin: (origin, callback) => callback(null, true),
   credentials: true,
 }));
 

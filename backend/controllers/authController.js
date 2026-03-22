@@ -24,28 +24,50 @@ const loginSchema = Joi.object({
 
 const register = async (req, res, next) => {
   try {
-    const { error: joiError, value } = registerSchema.validate(req.body);
-    if (joiError) return error(res, joiError.details[0].message, 400);
+    const { name, email, password, role, team } = req.body;
 
-    const existing = await User.findOne({ email: value.email });
-    if (existing) return error(res, 'Email already registered.', 409);
-
-    if (value.role !== 'Member') {
-      value.team = null; // Ensure only Members get a team
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: "Required fields missing" });
     }
 
-    const user = await User.create(value);
+    const existing = await User.findOne({ email });
+    if (existing) return res.status(409).json({ message: 'Email already registered.' });
+
+    const bcrypt = require('bcryptjs');
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+      role: role || "Member",
+      team: team || null
+    });
+
+    // Ensure CEO/CTO do not have teams assigned (safety cleanup)
+    if (user.role !== 'Member' && user.team) {
+      user.team = undefined;
+      await user.save();
+    }
 
     // Sync team members array
-    if (value.team) {
-      await Team.findByIdAndUpdate(value.team, { $addToSet: { members: user._id } });
+    if (user.team) {
+      await Team.findByIdAndUpdate(user.team, { $addToSet: { members: user._id } });
     }
 
     await logAudit('CREATE', 'User', user._id, user._id, { newState: user.toObject() });
 
-    return success(res, { user, token: generateToken(user._id) }, 'Registration successful', 201);
+    return res.status(201).json({
+      success: true,
+      user,
+      data: {
+        user,
+        token: generateToken(user._id)
+      }
+    });
   } catch (err) {
-    next(err);
+    console.error("REGISTER ERROR:", err);
+    return res.status(500).json({ message: err.message });
   }
 };
 
