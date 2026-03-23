@@ -1,5 +1,5 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 import Sidebar from "@/components/layout/Sidebar";
@@ -23,26 +23,28 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const router = useRouter();
   const pathname = usePathname();
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      if (!token) {
-        router.replace("/login");
-        return;
-      }
-      
-      // If we already have a user, we don't necessarily need to fetch again immediately
-      // unless we want to ensure freshness.
-      await fetchMe();
-    };
-
-    checkAuth();
-  }, [token]);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    if (!isAuthenticated && !token) {
+    setIsMounted(true);
+    const localToken = localStorage.getItem("taskpholio_token");
+    
+    if (!localToken) {
+      router.replace("/login");
+      return;
+    }
+    
+    // Fetch fresh user data on mount
+    fetchMe();
+  }, []);
+
+  useEffect(() => {
+    if (isMounted && !isAuthenticated && !token) {
       router.replace("/login");
     }
-  }, [isAuthenticated, token, router]);
+  }, [isMounted, isAuthenticated, token, router]);
+
+  if (!isMounted) return null; // Prevent hydration flash
 
   const title = pageTitles[pathname] || "Taskpholio";
 

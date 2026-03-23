@@ -27,6 +27,8 @@ const { requireAuth, requirePermission } = require('../middleware/auth');
 // Public routes
 router.get('/public-teams', getPublicTeams);
 router.post('/register', 
+  requireAuth,
+  requirePermission('manage_users'),
   rateLimitBypass,
   authLimiter,
   register
