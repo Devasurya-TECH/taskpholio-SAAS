@@ -1,14 +1,31 @@
 const express = require('express');
 const router = express.Router();
 const { upload } = require('../config/cloudinary');
+const { 
+  rateLimitBypass, 
+  checkTrustedIP, 
+  authLimiter, 
+  emailLimiter 
+} = require('../middleware/rateLimiter');
+const { checkAccountLockout } = require('../middleware/accountLockout');
 const { getPublicTeams, register, login, getMe, getAllUsers, updateUser, deleteUser, uploadAvatar } = require('../controllers/authController');
 const { requireAuth, requirePermission } = require('../middleware/auth');
-const { authLimiter } = require('../middleware/rateLimiter');
 
 // Public routes
 router.get('/public-teams', getPublicTeams);
-router.post('/register', authLimiter, register);
-router.post('/login', authLimiter, login);
+router.post('/register', 
+  rateLimitBypass,
+  authLimiter,
+  register
+);
+router.post('/login', 
+  rateLimitBypass,
+  checkTrustedIP,
+  checkAccountLockout,
+  emailLimiter,
+  authLimiter,
+  login
+);
 router.get('/me', requireAuth, getMe);
 router.patch('/profile/avatar', requireAuth, upload.single('avatar'), uploadAvatar);
 

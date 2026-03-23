@@ -95,8 +95,22 @@ const login = async (req, res) => {
     console.log("PASSWORD MATCH:", isMatch);
 
     if (!isMatch) {
+      // Increment failed attempts and potentially lock account
+      user.loginAttempts = (user.loginAttempts || 0) + 1;
+      if (user.loginAttempts >= 5) {
+        user.lockoutUntil = Date.now() + 15 * 60 * 1000; // 15 minute lockout
+        user.loginAttempts = 0;
+        await user.save();
+        return res.status(423).json({ message: "Account locked due to too many failed attempts. Try again in 15 minutes." });
+      }
+      await user.save();
       return res.status(400).json({ message: "Invalid password" });
     }
+
+    // Reset failed attempts on successful login
+    user.loginAttempts = 0;
+    user.lockoutUntil = undefined;
+    await user.save();
 
     const token = generateToken(user._id, user.role);
 

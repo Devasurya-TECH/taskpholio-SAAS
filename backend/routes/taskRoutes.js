@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { requireAuth, requirePermission, requireTaskAccess } = require('../middleware/auth');
+const { strictUserLimiter } = require('../middleware/rateLimiter');
 const { upload } = require('../config/cloudinary');
 const {
   getTasks, getTask, createTask, updateTask, deleteTask,
@@ -8,6 +9,7 @@ const {
 } = require('../controllers/taskController');
 
 router.use(requireAuth);
+router.use(strictUserLimiter);
 
 router.get('/', getTasks);
 router.post('/', requirePermission('create_tasks'), createTask); // Only CEO/CTO can create tasks

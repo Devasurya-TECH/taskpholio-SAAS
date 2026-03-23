@@ -1,12 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const { requireAuth, requirePermission } = require('../middleware/auth');
+const { moderateUserLimiter } = require('../middleware/rateLimiter');
 const {
   getTeams, getTeam, createTeam, updateTeam, deleteTeam,
   addMembers, removeMembers, getHierarchy,
 } = require('../controllers/teamController');
 
 router.use(requireAuth);
+router.use(moderateUserLimiter);
 
 router.get('/hierarchy', getHierarchy);
 router.get('/', getTeams);

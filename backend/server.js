@@ -111,11 +111,11 @@ app.use('/api', apiLimiter);
 
 // Routes - Advanced Rate Limits Apply to V1 Namespace
 const v1Router = express.Router();
-v1Router.use('/tasks', strictUserLimiter, taskRoutes);
-v1Router.use('/teams', moderateUserLimiter, teamRoutes);
-v1Router.use('/meetings', strictUserLimiter, meetingRoutes);
-v1Router.use('/notifications', moderateUserLimiter, notificationRoutes);
-v1Router.use('/analytics', moderateUserLimiter, analyticsRoutes);
+v1Router.use('/tasks', taskRoutes);
+v1Router.use('/teams', teamRoutes);
+v1Router.use('/meetings', meetingRoutes);
+v1Router.use('/notifications', notificationRoutes);
+v1Router.use('/analytics', analyticsRoutes);
 
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1', v1Router);

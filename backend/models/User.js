@@ -17,6 +17,8 @@ const userSchema = new mongoose.Schema(
       enum: ['CEO', 'CTO', 'Member'],
       default: 'Member',
     },
+    lockoutUntil: { type: Date },
+    loginAttempts: { type: Number, default: 0 },
     avatar: { type: String, default: '' },
     team: { type: mongoose.Schema.Types.ObjectId, ref: 'Team' },
     notifications: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Notification' }],
