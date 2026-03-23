@@ -28,7 +28,7 @@ export const useAdminStore = create<AdminState>()((set, get) => ({
     set({ isLoading: true });
     try {
       const params = new URLSearchParams(filters).toString();
-      const res = await api.get(`/auth/users${params ? `?${params}` : ""}`);
+      const res = await api.get(`auth/users${params ? `?${params}` : ""}`);
       const users = res.data.data.users;
       set({ users, isLoading: false });
     } catch { set({ isLoading: false }); }
@@ -37,56 +37,56 @@ export const useAdminStore = create<AdminState>()((set, get) => ({
   fetchTeams: async () => {
     set({ isLoading: true });
     try {
-      const res = await api.get("/teams");
+      const res = await api.get("teams");
       const teams = res.data.data.teams;
       set({ teams, isLoading: false });
     } catch { set({ isLoading: false }); }
   },
 
   createUser: async (data) => {
-    const res = await api.post("/auth/register", data);
+    const res = await api.post("auth/register", data);
     const user = res.data.data.user;
     set((s) => ({ users: [user, ...s.users] }));
     return user;
   },
 
   updateUser: async (id, data) => {
-    const res = await api.patch(`/auth/users/${id}`, data);
+    const res = await api.patch(`auth/users/${id}`, data);
     const updated = res.data.data.user;
     set((s) => ({ users: s.users.map((u) => (u._id === id ? updated : u)) }));
   },
 
   deleteUser: async (id) => {
-    await api.delete(`/auth/users/${id}`);
+    await api.delete(`auth/users/${id}`);
     set((s) => ({ users: s.users.filter((u) => u._id !== id) }));
   },
 
   createTeam: async (data) => {
-    const res = await api.post("/teams", data);
+    const res = await api.post("teams", data);
     const team = res.data.data.team;
     set((s) => ({ teams: [team, ...s.teams] }));
     return team;
   },
 
   updateTeam: async (id, data) => {
-    const res = await api.patch(`/teams/${id}`, data);
+    const res = await api.patch(`teams/${id}`, data);
     const updated = res.data.data.team;
     set((s) => ({ teams: s.teams.map((t) => (t._id === id ? updated : t)) }));
   },
 
   deleteTeam: async (id) => {
-    await api.delete(`/teams/${id}`);
+    await api.delete(`teams/${id}`);
     set((s) => ({ teams: s.teams.filter((t) => t._id !== id) }));
   },
 
   addMembers: async (teamId, memberIds) => {
-    const res = await api.post(`/teams/${teamId}/members`, { memberIds });
+    const res = await api.post(`teams/${teamId}/members`, { memberIds });
     const updated = res.data.data.team;
     set((s) => ({ teams: s.teams.map((t) => (t._id === teamId ? updated : t)) }));
   },
 
   removeMembers: async (teamId, memberIds) => {
-    await api.delete(`/teams/${teamId}/members`, { data: { memberIds } });
+    await api.delete(`teams/${teamId}/members`, { data: { memberIds } });
     get().fetchTeams();
   },
 }));

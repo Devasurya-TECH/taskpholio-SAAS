@@ -21,7 +21,7 @@ export default function Topbar({ title }: Props) {
   const { socket } = useSocket();
 
   useEffect(() => {
-    api.get("/notifications").then((res) => {
+    api.get("notifications").then((res) => {
       setUnread(res.data.data.unreadCount || 0);
     }).catch(() => {});
   }, []);

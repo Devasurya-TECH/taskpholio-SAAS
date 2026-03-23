@@ -30,7 +30,7 @@ export const useTaskStore = create<TaskState>()((set, get) => ({
     set({ isLoading: true });
     try {
       const params = new URLSearchParams(filters).toString();
-      const res = await api.get(`/tasks${params ? `?${params}` : ""}`);
+      const res = await api.get(`tasks${params ? `?${params}` : ""}`);
       set({ tasks: res.data.data.tasks, isLoading: false });
     } catch (err) {
       set({ isLoading: false });
@@ -41,7 +41,7 @@ export const useTaskStore = create<TaskState>()((set, get) => ({
   fetchTask: async (id) => {
     set({ isLoading: true });
     try {
-      const res = await api.get(`/tasks/${id}`);
+      const res = await api.get(`tasks/${id}`);
       set({ currentTask: res.data.data.task, isLoading: false });
     } catch (err) {
       set({ isLoading: false });
@@ -50,14 +50,14 @@ export const useTaskStore = create<TaskState>()((set, get) => ({
   },
 
   createTask: async (data) => {
-    const res = await api.post("/tasks", data);
+    const res = await api.post("tasks", data);
     const newTask = res.data.data.task;
     set((state) => ({ tasks: [newTask, ...state.tasks] }));
     return newTask;
   },
 
   updateTask: async (id, data) => {
-    const res = await api.patch(`/tasks/${id}`, data);
+    const res = await api.patch(`tasks/${id}`, data);
     const updated = res.data.data.task;
     set((state) => ({
       tasks: state.tasks.map((t) => (t._id === id ? updated : t)),
@@ -70,7 +70,7 @@ export const useTaskStore = create<TaskState>()((set, get) => ({
       tasks: state.tasks.map((t) => (t._id === id ? { ...t, status } : t)),
     }));
     try {
-      await api.patch(`/tasks/${id}`, { status });
+      await api.patch(`tasks/${id}`, { status });
     } catch (err) {
       get().fetchTasks();
       throw err;
@@ -78,12 +78,12 @@ export const useTaskStore = create<TaskState>()((set, get) => ({
   },
 
   deleteTask: async (id) => {
-    await api.delete(`/tasks/${id}`);
+    await api.delete(`tasks/${id}`);
     set((state) => ({ tasks: state.tasks.filter((t) => t._id !== id) }));
   },
 
   acknowledgeTask: async (id, status) => {
-    const res = await api.post(`/tasks/${id}/acknowledge`, { status });
+    const res = await api.post(`tasks/${id}/acknowledge`, { status });
     const acks = res.data.data.acknowledgements;
     set((state) => ({
       tasks: state.tasks.map((t) =>

@@ -22,7 +22,7 @@ export default function RegisterPage() {
   const router = useRouter();
 
   useEffect(() => {
-    api.get("/auth/public-teams").then((res) => {
+    api.get("auth/public-teams").then((res) => {
       setPublicTeams(res.data.data.teams);
     }).catch(() => {
       // Slient fail if no teams exist or API unreachable
@@ -34,25 +34,16 @@ export default function RegisterPage() {
     if (isLoading) return;
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
+      const res = await api.post("auth/register", {
           name,
           email,
           password,
           role,
           team
-        })
       });
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        console.error("FRONTEND ERROR:", data);
-        alert(data.message || "Registration failed");
+      if (res.status !== 200 && res.status !== 201) {
+        toast.error(res.data.message || "Registration failed");
         return;
       }
 

@@ -1,5 +1,7 @@
 import axios from "axios";
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL?.endsWith('/') 
+  ? process.env.NEXT_PUBLIC_API_URL 
+  : `${process.env.NEXT_PUBLIC_API_URL}/`;
 
 if (!API_BASE_URL) {
   console.warn("NEXT_PUBLIC_API_URL is not defined. API requests might fail.");

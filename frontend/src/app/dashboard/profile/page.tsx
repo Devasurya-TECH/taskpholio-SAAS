@@ -29,7 +29,7 @@ export default function ProfilePage() {
     formData.append("avatar", file);
 
     try {
-      const res = await api.patch("/profile/avatar", formData, {
+      const res = await api.patch("profile/avatar", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       // Update local storage and store

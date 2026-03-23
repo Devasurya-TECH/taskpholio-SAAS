@@ -21,7 +21,7 @@ export default function NotificationsPage() {
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
-    api.get("/notifications").then((res) => {
+    api.get("notifications").then((res) => {
       setNotifications(res.data.data.notifications || []);
       setUnreadCount(res.data.data.unreadCount || 0);
     }).catch(() => {}).finally(() => setLoading(false));
@@ -29,7 +29,7 @@ export default function NotificationsPage() {
 
   const markAllRead = async () => {
     try {
-      await api.patch("/notifications/read-all");
+      await api.patch("notifications/read-all");
       setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
       setUnreadCount(0);
       toast.success("All notifications marked as read.");

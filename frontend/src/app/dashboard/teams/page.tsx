@@ -36,8 +36,8 @@ export default function TeamsPage() {
 
   useEffect(() => {
     Promise.all([
-      api.get("/teams/hierarchy"),
-      api.get("/teams"),
+      api.get("teams/hierarchy"),
+      api.get("teams"),
     ]).then(([h, t]) => {
       setHierarchy(h.data.data.hierarchy);
       setTeams(t.data.data.teams);

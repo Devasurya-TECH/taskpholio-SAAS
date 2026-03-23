@@ -19,7 +19,7 @@ export default function MeetingsPage() {
   const { socket } = useSocket();
 
   useEffect(() => {
-    api.get("/meetings").then((res) => setMeetings(res.data.data.meetings || [])).catch(() => {}).finally(() => setLoading(false));
+    api.get("meetings").then((res) => setMeetings(res.data.data.meetings || [])).catch(() => {}).finally(() => setLoading(false));
   }, []);
 
   useEffect(() => {
@@ -48,7 +48,7 @@ export default function MeetingsPage() {
     e.preventDefault();
     setSubmitting(true);
     try {
-      const res = await api.post("/meetings", {
+      const res = await api.post("meetings", {
         ...form,
         participants: form.participants ? form.participants.split(",").map((s) => s.trim()) : [],
       });

@@ -30,7 +30,7 @@ export const useAuthStore = create<AuthState>()(
           const API = process.env.NEXT_PUBLIC_API_URL;
           console.log("LOGIN URL:", `${API}/auth/login`);
           
-          const res = await api.post("/auth/login", { email, password });
+          const res = await api.post("auth/login", { email, password });
           const token = res.data.data.token;
           const user = res.data.data.user;
           
@@ -50,7 +50,7 @@ export const useAuthStore = create<AuthState>()(
           console.log("REGISTER URL:", `${API}/auth/register`);
           
           const payload = team ? { name, email, password, role, team } : { name, email, password, role };
-          const res = await api.post("/auth/register", payload);
+          const res = await api.post("auth/register", payload);
           const token = res.data.data.token;
           const user = res.data.data.user;
           
@@ -70,7 +70,7 @@ export const useAuthStore = create<AuthState>()(
 
       fetchMe: async () => {
         try {
-          const res = await api.get("/auth/me");
+          const res = await api.get("auth/me");
           set({ user: res.data.data.user, isAuthenticated: true });
         } catch {
           set({ user: null, token: null, isAuthenticated: false });
