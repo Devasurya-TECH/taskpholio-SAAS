@@ -95,15 +95,17 @@ exports.register = async (req, res) => {
     res.status(201).json({
       success: true,
       message: 'Registration successful. Please check your email to verify your account.',
-      token,
-      user: {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        team: user.team,
-        avatar: user.avatar,
-        emailVerified: user.emailVerified
+      data: {
+        token,
+        user: {
+          _id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          team: user.team,
+          avatar: user.avatar,
+          emailVerified: user.emailVerified
+        }
       }
     });
   } catch (error) {
@@ -181,16 +183,18 @@ exports.login = async (req, res) => {
     res.json({
       success: true,
       message: 'Login successful',
-      token,
-      user: {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        team: user.team,
-        avatar: user.avatar,
-        emailVerified: user.emailVerified,
-        preferences: user.preferences
+      data: {
+        token,
+        user: {
+          _id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          team: user.team,
+          avatar: user.avatar,
+          emailVerified: user.emailVerified,
+          preferences: user.preferences
+        }
       }
     });
   } catch (error) {
@@ -211,7 +215,7 @@ exports.getMe = async (req, res) => {
 
     res.json({
       success: true,
-      user
+      data: { user }
     });
   } catch (error) {
     res.status(500).json({
@@ -271,7 +275,8 @@ exports.verifyEmail = async (req, res) => {
 
     res.json({
       success: true,
-      message: 'Email verified successfully'
+      message: 'Email verified successfully',
+      data: { user }
     });
   } catch (error) {
     res.status(500).json({
@@ -369,7 +374,8 @@ exports.resetPassword = async (req, res) => {
 
     res.json({
       success: true,
-      message: 'Password reset successful'
+      message: 'Password reset successful',
+      data: { user }
     });
   } catch (error) {
     res.status(500).json({
@@ -424,7 +430,7 @@ exports.getAllUsers = async (req, res) => {
     const users = await User.find().populate('team', 'name color');
     res.json({
       success: true,
-      users
+      data: { users }
     });
   } catch (error) {
     res.status(500).json({
@@ -444,7 +450,7 @@ exports.updateUser = async (req, res) => {
 
     res.json({
       success: true,
-      user
+      data: { user }
     });
   } catch (error) {
     res.status(500).json({
@@ -476,7 +482,7 @@ exports.getPublicTeams = async (req, res) => {
     const teams = await Team.find({ isActive: true }).select('name color icon');
     res.json({
       success: true,
-      teams
+      data: { teams }
     });
   } catch (error) {
     res.status(500).json({
