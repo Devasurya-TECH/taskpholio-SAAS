@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const { upload, cloudinary } = require('../config/cloudinary');
-const { protect } = require('../middleware/auth');
+const { requireAuth } = require('../middleware/auth');
 
 // @desc    Upload single file
 // @route   POST /api/v1/upload/single
 // @access  Private
-router.post('/single', protect, upload.single('file'), async (req, res) => {
+router.post('/single', requireAuth, upload.single('file'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({
@@ -38,7 +38,7 @@ router.post('/single', protect, upload.single('file'), async (req, res) => {
 // @desc    Upload multiple files
 // @route   POST /api/v1/upload/multiple
 // @access  Private
-router.post('/multiple', protect, upload.array('files', 5), async (req, res) => {
+router.post('/multiple', requireAuth, upload.array('files', 5), async (req, res) => {
   try {
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({
@@ -73,7 +73,7 @@ router.post('/multiple', protect, upload.array('files', 5), async (req, res) => 
 // @desc    Delete file
 // @route   DELETE /api/v1/upload/:publicId
 // @access  Private
-router.delete('/:publicId', protect, async (req, res) => {
+router.delete('/:publicId', requireAuth, async (req, res) => {
   try {
     const { publicId } = req.params;
     
