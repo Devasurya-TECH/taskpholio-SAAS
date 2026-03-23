@@ -45,13 +45,18 @@ export const useAuthStore = create<AuthState>()(
       register: async (name, email, password, role, team) => {
         set({ isLoading: true });
         try {
+          const API = process.env.NEXT_PUBLIC_API_URL;
+          console.log("REGISTER URL:", `${API}/auth/register`);
+          
           const payload = team ? { name, email, password, role, team } : { name, email, password, role };
           const res = await api.post("/auth/register", payload);
           const { user, token } = res.data.data;
+          
           localStorage.setItem("taskpholio_token", token);
           set({ user, token, isAuthenticated: true, isLoading: false });
-        } catch (err) {
+        } catch (err: any) {
           set({ isLoading: false });
+          console.error("REGISTER ERROR:", err.response?.data || err.message);
           throw err;
         }
       },

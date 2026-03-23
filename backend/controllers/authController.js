@@ -134,9 +134,9 @@ const getAllUsers = async (req, res, next) => {
       .skip(skip)
       .limit(limit);
 
-    return success(res, { 
-      users, 
-      pagination: { total, page, totalPages: Math.ceil(total / limit), limit } 
+    return success(res, {
+      users,
+      pagination: { total, page, totalPages: Math.ceil(total / limit), limit }
     });
   } catch (err) {
     next(err);
@@ -160,7 +160,7 @@ const updateUser = async (req, res, next) => {
 
     const oldTeam = user.team?.toString() || null;
     let newTeam = updates.team !== undefined ? updates.team : oldTeam;
-    
+
     // Convert empty string/null cases
     if (!newTeam) newTeam = null;
 
@@ -168,7 +168,7 @@ const updateUser = async (req, res, next) => {
     Object.assign(user, updates);
     if (newTeam === null) user.team = undefined; // Set to undefined to clear the field in Mongoose
     await user.save();
-    
+
     // Sync Team documents if team changed
     if (oldTeam !== newTeam) {
       if (oldTeam) await Team.findByIdAndUpdate(oldTeam, { $pull: { members: user._id } });
@@ -176,7 +176,7 @@ const updateUser = async (req, res, next) => {
     }
 
     const populated = await User.findById(user._id).select('-password').populate('team', 'name');
-    
+
     await logAudit('UPDATE', 'User', user._id, req.user._id, { oldState, newState: populated.toObject() }); // Log audit
 
     return success(res, { user: populated }, 'User updated');
@@ -211,7 +211,7 @@ const deleteUser = async (req, res, next) => {
     user.isDeleted = true; // Soft delete
     user.deletedAt = new Date(); // Record deletion timestamp
     await user.save();
-    
+
     // The instruction snippet removed team sync, so following that.
     // If team sync is desired for soft delete, it should be re-added here.
     // if (user.team) {
