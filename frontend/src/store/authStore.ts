@@ -85,7 +85,7 @@ export const useAuthStore = create<AuthState>()(
 
       updateProfile: async (updates) => {
         try {
-          const res = await api.patch("users/profile", updates);
+          const res = await api.patch("auth/profile", updates);
           set({ user: res.data.data.user });
         } catch (err) {
           console.error("Profile update failed:", err);

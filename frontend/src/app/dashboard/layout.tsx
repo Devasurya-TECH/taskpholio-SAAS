@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
+import { useTaskStore } from "@/store/taskStore";
 import Sidebar from "@/components/layout/Sidebar";
 import Topbar from "@/components/layout/Topbar";
 import { usePathname } from "next/navigation";
@@ -22,6 +23,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const { isAuthenticated, fetchMe, token } = useAuthStore();
   const router = useRouter();
   const pathname = usePathname();
+  const { fetchTasks } = useTaskStore();
 
   const [isMounted, setIsMounted] = useState(false);
 
@@ -43,6 +45,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       router.replace("/login");
     }
   }, [isMounted, isAuthenticated, token, router]);
+
+  // 10-second silent background polling
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    const intervalId = setInterval(() => {
+      fetchTasks(true, true);
+    }, 10000);
+    return () => clearInterval(intervalId);
+  }, [isAuthenticated, fetchTasks]);
 
   if (!isMounted) return null; // Prevent hydration flash
 

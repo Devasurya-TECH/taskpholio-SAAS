@@ -13,7 +13,7 @@ interface TaskState {
     priority: string;
     search: string;
   };
-  fetchTasks: (force?: boolean, filters?: Record<string, string>) => Promise<void>;
+  fetchTasks: (force?: boolean, silent?: boolean, filters?: Record<string, string>) => Promise<void>;
   fetchTask: (id: string) => Promise<void>;
   createTask: (data: any) => Promise<Task>;
   updateTask: (id: string, data: Partial<Task>) => Promise<void>;
@@ -39,11 +39,11 @@ export const useTaskStore = create<TaskState>()((set, get) => ({
     search: ''
   },
 
-  fetchTasks: async (force = false, additionalFilters = {}) => {
+  fetchTasks: async (force = false, silent = false, additionalFilters = {}) => {
     const { lastFetch, isLoading } = get();
     if (!force && lastFetch && Date.now() - lastFetch < 30000) return;
     
-    set({ isLoading: true });
+    if (!silent) set({ isLoading: true });
     try {
       const res = await api.get("tasks", { params: additionalFilters });
       set({ 

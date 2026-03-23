@@ -440,6 +440,76 @@ exports.updatePassword = async (req, res) => {
   }
 };
 
+// Update My Profile (name, phone, bio, etc.)
+exports.updateMyProfile = async (req, res) => {
+  try {
+    const updates = {};
+    const allowedFields = ['name', 'phone', 'bio', 'preferences'];
+    
+    // Only allow updating specific fields
+    Object.keys(req.body).forEach(key => {
+      if (allowedFields.includes(key)) {
+        updates[key] = req.body[key];
+      }
+    });
+
+    if (req.body.preferences) {
+      updates.preferences = { ...req.user.preferences, ...req.body.preferences };
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { $set: updates },
+      { new: true, runValidators: true }
+    ).populate('team', 'name color');
+
+    res.json({
+      success: true,
+      data: { user }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+// Update My Avatar
+exports.updateMyAvatar = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please upload an image file'
+      });
+    }
+
+    const user = await User.findById(req.user._id);
+
+    // If we wanted to delete the old avatar from Cloudinary, we could extract the public ID here.
+    // For now, we will just overwrite the avatar URL with the new Cloudinary URL.
+    user.avatar = req.file.path; // Cloudinary returns the secure URL in req.file.path
+    
+    await user.save();
+
+    // Ensure we send back the populated user
+    const populatedUser = await User.findById(req.user._id).populate('team', 'name color');
+
+    res.json({
+      success: true,
+      data: { user: populatedUser }
+    });
+  } catch (error) {
+    console.error('Avatar update error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update avatar. Please try again.',
+      error: error.message
+    });
+  }
+};
+
 // Get All Users (Admin)
 exports.getAllUsers = async (req, res) => {
   try {

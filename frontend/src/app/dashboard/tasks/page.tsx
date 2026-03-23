@@ -6,6 +6,7 @@ import { SortableContext, useSortable, arrayMove, verticalListSortingStrategy } 
 import { CSS } from "@dnd-kit/utilities";
 import { Plus, Search, Filter } from "lucide-react";
 import { useTaskStore } from "@/store/taskStore";
+import { useAuthStore } from "@/store/authStore";
 import { Task } from "@/lib/types";
 import { cn, getPriorityColor, getStatusColor, formatDate } from "@/lib/utils";
 import Link from "next/link";
@@ -13,9 +14,9 @@ import { toast } from "sonner";
 import CreateTaskModal from "@/components/tasks/CreateTaskModal";
 
 const COLUMNS: { id: Task["status"]; label: string; color: string }[] = [
-  { id: "Not Started", label: "Not Started", color: "border-muted-foreground/30" },
-  { id: "In Progress", label: "In Progress", color: "border-blue-500/40" },
-  { id: "Completed", label: "Completed", color: "border-primary/40" },
+  { id: "pending", label: "Pending", color: "border-muted-foreground/30" },
+  { id: "in-progress", label: "In Progress", color: "border-blue-500/40" },
+  { id: "completed", label: "Completed", color: "border-primary/40" },
 ];
 
 function TaskCard({ task }: { task: Task }) {
@@ -57,14 +58,14 @@ function TaskCard({ task }: { task: Task }) {
 
           <div className="flex items-center justify-between">
             <div className="flex -space-x-1.5">
-              {task.assignedTo?.slice(0, 3).map((u) => (
-                <div key={u._id} title={u.name} className="w-6 h-6 rounded-full bg-primary/20 border-2 border-card flex items-center justify-center text-primary text-[10px] font-bold">
-                  {u.name[0]}
+              {task.assignedTo && (
+                <div title={task.assignedTo.name} className="w-6 h-6 rounded-full bg-primary/20 border-2 border-card flex items-center justify-center text-primary text-[10px] font-bold">
+                  {task.assignedTo.name[0]}
                 </div>
-              ))}
+              )}
             </div>
-            {task.deadline && (
-              <span className="text-[10px] text-muted-foreground">{formatDate(task.deadline)}</span>
+            {task.dueDate && (
+              <span className="text-[10px] text-muted-foreground">{formatDate(task.dueDate)}</span>
             )}
           </div>
         </motion.div>
@@ -99,6 +100,7 @@ function Column({ id, label, color, tasks }: { id: Task["status"]; label: string
 }
 
 export default function TasksPage() {
+  const { user } = useAuthStore();
   const { tasks, fetchTasks, updateTaskStatus, isLoading } = useTaskStore();
   const [search, setSearch] = useState("");
   const [priorityFilter, setPriorityFilter] = useState("");
@@ -144,14 +146,16 @@ export default function TasksPage() {
           <h2 className="text-xl font-bold text-foreground">Tasks</h2>
           <p className="text-sm text-muted-foreground">{tasks.length} tasks total</p>
         </div>
-        <motion.button
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.97 }}
-          onClick={() => setShowModal(true)}
-          className="flex items-center gap-2 bg-primary text-primary-foreground text-sm font-semibold px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors"
-        >
-          <Plus className="w-4 h-4" /> New Task
-        </motion.button>
+        {(user?.role === 'CEO' || user?.role === 'CTO') && (
+          <motion.button
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            onClick={() => setShowModal(true)}
+            className="flex items-center gap-2 bg-primary text-primary-foreground text-sm font-semibold px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors"
+          >
+            <Plus className="w-4 h-4" /> New Task
+          </motion.button>
+        )}
       </div>
 
       {/* Filters */}

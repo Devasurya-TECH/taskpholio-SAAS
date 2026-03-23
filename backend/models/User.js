@@ -32,8 +32,8 @@ const userSchema = new mongoose.Schema({
     required: false
   },
   avatar: {
-    url: { type: String, default: '' },
-    publicId: { type: String, default: '' }
+    type: String,
+    default: ''
   },
   phone: String,
   bio: String,

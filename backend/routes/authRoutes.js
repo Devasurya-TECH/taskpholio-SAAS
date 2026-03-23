@@ -18,6 +18,8 @@ const {
   forgotPassword, 
   resetPassword, 
   updatePassword,
+  updateMyProfile,
+  updateMyAvatar,
   getAllUsers, 
   updateUser, 
   deleteUser 
@@ -51,6 +53,8 @@ router.post('/reset-password/:token', resetPassword);
 router.get('/me', requireAuth, getMe);
 router.post('/logout', requireAuth, logout);
 router.post('/update-password', requireAuth, updatePassword);
+router.patch('/profile', requireAuth, updateMyProfile);
+router.patch('/profile/avatar', requireAuth, upload.single('avatar'), updateMyAvatar);
 
 // Admin user management
 router.get('/users', requireAuth, requirePermission('manage_users'), getAllUsers);
