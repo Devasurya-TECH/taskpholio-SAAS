@@ -34,24 +34,12 @@ export default function RegisterPage() {
     if (isLoading) return;
 
     try {
-      const res = await api.post("auth/register", {
-          name,
-          email,
-          password,
-          role,
-          team
-      });
-
-      if (res.status !== 200 && res.status !== 201) {
-        toast.error(res.data.message || "Registration failed");
-        return;
-      }
-
-      toast.success("Account created successfully!");
-      router.push("/login");
-    } catch (error) {
-      console.error("FRONTEND REQUEST ERROR:", error);
-      alert("Registration failed");
+      await register(name, email, password, role, team);
+      toast.success("Account created successfully! Welcome to the mission.");
+      router.push("/dashboard");
+    } catch (error: any) {
+      console.error("REGISTRATION ERROR:", error);
+      toast.error(error.response?.data?.message || "Registration failed. Please check your credentials.");
     }
   };
 
