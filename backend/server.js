@@ -52,6 +52,11 @@ logger.info(`Server timezone offset: ${new Date().getTimezoneOffset()}`);
 
 const app = express();
 
+app.use((req, res, next) => {
+  console.log(`[DIAGNOSTIC] ${req.method} ${req.url}`);
+  next();
+});
+
 if (process.env.SENTRY_DSN) {
   Sentry.init({
     dsn: process.env.SENTRY_DSN,
