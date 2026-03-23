@@ -32,11 +32,20 @@ app.use(helmet({
 
 // Cross-Origin Resource Sharing
 app.use(cors({
-  origin: [
-    'http://localhost:3000',
-    'http://localhost:3001',
-    process.env.FRONTEND_URL
-  ].filter(Boolean),
+  origin: function (origin, callback) {
+    const allowedList = [
+      'http://localhost:3000',
+      'http://localhost:3001',
+      'https://taskpholio-saas.vercel.app',
+      process.env.FRONTEND_URL
+    ].filter(Boolean);
+
+    if (!origin || allowedList.includes(origin) || origin.endsWith('.vercel.app')) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
